@@ -4,6 +4,16 @@ variable "S6_VERSION" { default = "v3.2.0.0" }
 target "docker-metadata-action" {}
 target "github-metadata-action" {}
 
+# Download s6-overlay tarballs for local testing.
+target "download" {
+    output = ["./output"]
+    platforms = ["local"]
+    target = "download"
+}
+target "verify" {
+    target = "verify"
+}
+
 group "default" {
     targets = [
         "s6-overlay",
@@ -50,31 +60,31 @@ target "s6-overlay-syslogd" {
     target = "s6-overlay-syslogd"
 }
 
-# The "release" group is used to build locally in the event that CI/CD is not available.
+# The "build" group is used to build locally in the event that CI/CD is not available.
 # Or in most cases, it got rate-limited by Docker Hub.
-# e.g: S6_VERSION=v3.2.0.0 docker buildx bake release --push
-group "release" {
+# e.g: S6_VERSION=v3.2.0.0 docker buildx bake build --push
+group "build" {
     targets = [
-        "release-s6-overlay",
-        "release-s6-overlay-symlinks",
-        "release-s6-overlay-syslogd",
+        "build-s6-overlay",
+        "build-s6-overlay-symlinks",
+        "build-s6-overlay-syslogd",
     ]
 }
-target "release-s6-overlay" {
+target "build-s6-overlay" {
     inherits = [ "s6-overlay" ]
     tags = [ 
         "docker.io/socheatsok78/s6-overlay:${S6_VERSION}",
         "ghcr.io/socheatsok78/s6-overlay:${S6_VERSION}",
     ]
 }
-target "release-s6-overlay-symlinks" {
+target "build-s6-overlay-symlinks" {
     inherits = [ "s6-overlay-symlinks" ]
     tags = [ 
         "docker.io/socheatsok78/s6-overlay:${S6_VERSION}-symlinks",
         "ghcr.io/socheatsok78/s6-overlay:${S6_VERSION}-symlinks",
     ]
 }
-target "release-s6-overlay-syslogd" {
+target "build-s6-overlay-syslogd" {
     inherits = [ "s6-overlay-syslogd" ]
     tags = [ 
         "docker.io/socheatsok78/s6-overlay:${S6_VERSION}-syslogd",
@@ -107,14 +117,4 @@ target "local-s6-overlay-syslogd" {
     inherits = [ "local-s6-overlay" ]
     target = "s6-overlay-syslogd"
     tags = [ "socheatsok78/s6-overlay:${S6_VERSION}-syslogd"]
-}
-
-# Download s6-overlay tarballs for local testing.
-target "tarballs" {
-    output = ["./tarballs"]
-    platforms = ["local"]
-    target = "tarballs"
-}
-target "checksums" {
-    target = "checksums"
 }
