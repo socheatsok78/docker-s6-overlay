@@ -38,10 +38,7 @@ ADD ${S6_DOWNLOAD_URL}/syslogd-overlay-noarch.tar.xz.sha256         /syslogd-ove
 
 FROM --platform=${BUILDPLATFORM} alpine:latest AS verify
 WORKDIR /tmp/output
-RUN --mount=type=bind,source=./output,target=/tmp/output <<EOT
-    set -e
-    sha256sum -cw *.sha256
-EOT
+RUN --mount=type=bind,source=./output,target=/tmp/output sha256sum -cw *.sha256
 
 # Specify the target architecture and variant for s6-overlay
 # See https://github.com/just-containers/s6-overlay/blob/d6f37bb2052cfc5705154315419dcacb3975f11e/README.md?plain=1#L1023
