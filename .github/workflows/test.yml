@@ -1,0 +1,185 @@
+name: "Test"
+
+on:
+  push:
+    branches:
+      - next
+      - trunk
+  pull_request:
+    branches:
+      - next
+      - trunk
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - id: releases
+        uses: actions-matrix/github-release-matrix-action@v1
+        with:
+          repository: "just-containers/s6-overlay"
+        env:
+          GH_TOKEN: ${{ github.token }}
+    outputs:
+      matrix: ${{ steps.releases.outputs.matrix }}
+
+  build:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix: ${{ fromJson(needs.generate.outputs.matrix) }}
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5
+        env:
+          S6_VERSION: ${{ matrix.releases.tag_name }}
+        with:
+          images: |
+            docker.io/${{ github.actor }}/s6-overlay
+            ghcr.io/${{ github.actor }}/s6-overlay
+          flavor: latest=false
+          tags: type=raw,value=${{ matrix.releases.tag_name }}
+
+      - name: Generate GitHub metadata
+        id: github-meta
+        uses: dockerbakery/github-metadata-action@v2
+
+      - name: Build and push
+        uses: docker/bake-action@v6
+        with:
+          targets: s6-overlay
+          push: false
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.docker-meta.outputs.bake-file }}
+            cwd://${{ steps.github-meta.outputs.bake-file }}
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
+
+  symlinks:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix: ${{ fromJson(needs.generate.outputs.matrix) }}
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5
+        env:
+          S6_VERSION: ${{ matrix.releases.tag_name }}
+        with:
+          images: |
+            docker.io/${{ github.actor }}/s6-overlay
+            ghcr.io/${{ github.actor }}/s6-overlay
+          flavor: latest=false
+          tags: type=raw,value=${{ matrix.releases.tag_name }}-symlinks
+
+      - name: Generate GitHub metadata
+        id: github-meta
+        uses: dockerbakery/github-metadata-action@v2
+
+      - name: Build and push
+        uses: docker/bake-action@v6
+        with:
+          targets: s6-overlay-symlinks
+          push: false
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.docker-meta.outputs.bake-file }}
+            cwd://${{ steps.github-meta.outputs.bake-file }}
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
+
+  syslogd:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix: ${{ fromJson(needs.generate.outputs.matrix) }}
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5
+        env:
+          S6_VERSION: ${{ matrix.releases.tag_name }}
+        with:
+          images: |
+            docker.io/${{ github.actor }}/s6-overlay
+            ghcr.io/${{ github.actor }}/s6-overlay
+          flavor: latest=false
+          tags: type=raw,value=${{ matrix.releases.tag_name }}-syslogd
+
+      - name: Generate GitHub metadata
+        id: github-meta
+        uses: dockerbakery/github-metadata-action@v2
+
+      - name: Build and push
+        uses: docker/bake-action@v6
+        with:
+          targets: s6-overlay-syslogd
+          push: false
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.docker-meta.outputs.bake-file }}
+            cwd://${{ steps.github-meta.outputs.bake-file }}
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max

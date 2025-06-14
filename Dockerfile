@@ -4,6 +4,23 @@ ARG GH_DOWNLOAD='https://github.com/just-containers/s6-overlay/releases/download
 # Tools for building the s6-overlay images
 FROM alpine:latest AS internal
 RUN apk add --no-cache curl cmd:sha256sum
+ARG TARGETARCH TARGETVARIANT
+RUN <<EOT
+    {
+    # See:
+    # https://github.com/just-containers/s6-overlay/blob/d6f37bb2052cfc5705154315419dcacb3975f11e/README.md?plain=1#L1023
+        case "${TARGETARCH}${TARGETVARIANT:+/}${TARGETVARIANT}" in
+            (amd64) echo 'x86_64' ;;
+            (arm64) echo 'aarch64' ;;
+            (riscv64) echo 'riscv64' ;;
+            (s390x) echo 's390x' ;;
+            (386) echo 'i686' ;;
+            (arm/v6) echo 'armhf' ;;
+            (arm/v7) echo 'arm' ;;
+            (*) echo 1>&2 'Unsupported architecture!' ; exit 1 ;;
+        esac
+    } >| /S6_ARCH
+EOT
 
 
 # Overlay for s6-overlay-noarch.tar.xz & s6-overlay-${arch}.tar.xz
@@ -12,12 +29,9 @@ ARG GH_DOWNLOAD
 ARG S6_VERSION
 ADD "${GH_DOWNLOAD}/${S6_VERSION}/s6-overlay-noarch.tar.xz.sha256" /tmp/
 ADD "${GH_DOWNLOAD}/${S6_VERSION}/s6-overlay-noarch.tar.xz" /tmp/
-RUN <<EOF
+RUN <<EOT
     set -e
-    S6_ARCH=$(uname -m)
-    if [[ "${S6_ARCH}" == "armv7l" ]]; then
-        S6_ARCH=arm
-    fi
+    S6_ARCH=$(cat /S6_ARCH)
     mkdir /s6-overlay-rootfs /verified
     set -x
     curl -L "${GH_DOWNLOAD}/${S6_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" -o /tmp/s6-overlay-${S6_ARCH}.tar.xz
@@ -32,7 +46,7 @@ RUN <<EOF
     done
     tar  -C /s6-overlay-rootfs -Jxpf /verified/s6-overlay-noarch.tar.xz
     tar  -C /s6-overlay-rootfs -Jxpf /verified/s6-overlay-${S6_ARCH}.tar.xz
-EOF
+EOT
 FROM scratch AS s6-overlay
 COPY --from=s6-overlay-rootfs /s6-overlay-rootfs /
 
