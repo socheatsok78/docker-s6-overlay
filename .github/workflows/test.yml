@@ -3,10 +3,12 @@ name: "Test"
 on:
   push:
     branches:
+      - develop
       - next
       - trunk
   pull_request:
     branches:
+      - develop
       - next
       - trunk
 
