@@ -2,7 +2,8 @@ ARG S6_REPO=just-containers/s6-overlay
 ARG S6_VERSION=v3.2.0.0
 ARG S6_DOWNLOAD_URL=https://github.com/${S6_REPO}/releases/download/${S6_VERSION}
 
-# tarballs
+# Download s6-overlay tarballs for various architectures
+# $ docker buildx bake download --no-cache
 FROM scratch AS download
 ARG S6_DOWNLOAD_URL
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-aarch64.tar.xz                    /s6-overlay-aarch64.tar.xz
@@ -20,7 +21,8 @@ ADD ${S6_DOWNLOAD_URL}/s6-overlay-symlinks-noarch.tar.xz            /s6-overlay-
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-x86_64.tar.xz                     /s6-overlay-x86_64.tar.xz
 ADD ${S6_DOWNLOAD_URL}/syslogd-overlay-noarch.tar.xz                /syslogd-overlay-noarch.tar.xz
 
-# verify
+# Verify the downloaded tarballs
+# $ docker buildx bake verify --no-cache
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-aarch64.tar.xz.sha256             /s6-overlay-aarch64.tar.xz.sha256
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-arm.tar.xz.sha256                 /s6-overlay-arm.tar.xz.sha256
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-armhf.tar.xz.sha256               /s6-overlay-armhf.tar.xz.sha256
@@ -76,6 +78,7 @@ FROM s6-overlay-noarch AS s6-overlay-s390x
 ADD output/s6-overlay-s390x.tar.xz /
 
 # s6-overlay
+# This is the default target for s6-overlay, the architecture and variant will be determined by the build platform
 FROM s6-overlay-${TARGETARCH}${TARGETVARIANT} AS s6-overlay
 FROM s6-overlay
 
