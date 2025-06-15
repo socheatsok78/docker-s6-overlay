@@ -43,6 +43,17 @@ WORKDIR /tmp/output
 RUN --mount=type=bind,source=./output,target=/tmp/output sha256sum -cw *.sha256
 
 # Specify the target architecture and variant for s6-overlay
+
+# | ${TARGETARCH} | ${arch} | Notes                 |
+# |:--------------|:--------|:----------------------|
+# | 386           | i686    | i486 for very old hw  |
+# | amd64         | x86_64  |                       |
+# | armv6         | armhf   | Raspberry Pi 1        |
+# | armv7         | arm     | armv7 with soft-float |
+# | arm64         | aarch64 |                       |
+# | riscv64       | riscv64 |                       |
+# | s390x         | s390x   |                       |
+
 # See https://github.com/just-containers/s6-overlay/blob/d6f37bb2052cfc5705154315419dcacb3975f11e/README.md?plain=1#L1023
 
 # s6-overlay-noarch.tar.xz
