@@ -29,6 +29,7 @@ on:
         required: false
         type: string
         default: ''
+
 env:
   S6_VERSION: ${{ inputs.tag_name }}
 
