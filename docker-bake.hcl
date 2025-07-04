@@ -33,12 +33,14 @@ target "tarballs" {
     output = ["./output"]
     platforms = ["local"]
     target = "tarballs"
+    no-cache = true
 }
 target "verify" {
     args = {
         S6_VERSION = "${S6_VERSION}"
     }
     target = "verify"
+    no-cache = true
 }
 
 group "default" {
