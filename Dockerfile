@@ -1,3 +1,8 @@
+# The S6_VERSION variable is used to specify the version of s6-overlay to build.
+# It MUST NOT provides any default value.
+# It is expected to be set by the user when running the build command.
+#
+# e.g: S6_VERSION=v3.2.0.0 docker buildx bake build
 ARG S6_VERSION
 
 ARG S6_REPO=just-containers/s6-overlay

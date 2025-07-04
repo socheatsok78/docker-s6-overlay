@@ -1,6 +1,19 @@
-
+# The S6_VERSION variable is used to specify the version of s6-overlay to build.
+# It MUST NOT provides any default value.
+# It is expected to be set by the user when running the build command.
+#
+# e.g: S6_VERSION=v3.2.0.0 docker buildx bake build
 variable "S6_VERSION" {
+    validation {
+        condition = S6_VERSION != ""
+        error_message = "S6_VERSION must not be empty."
+    }
+    validation {
+        condition = S6_VERSION == regex("^v[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$", S6_VERSION)
+        error_message = "S6_VERSION must be set to a valid version."
+    }
 }
+
 variable "ALPINE_VERSION" { default = "3.22.0" }
 
 target "docker-metadata-action" {}
