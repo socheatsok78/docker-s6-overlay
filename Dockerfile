@@ -1,5 +1,6 @@
+ARG S6_VERSION
+
 ARG S6_REPO=just-containers/s6-overlay
-ARG S6_VERSION=v3.2.0.0
 ARG S6_DOWNLOAD_URL=https://github.com/${S6_REPO}/releases/download/${S6_VERSION}
 ARG ALPINE_VERSION=3.22.0
 

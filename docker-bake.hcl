@@ -1,5 +1,6 @@
 
-variable "S6_VERSION" { default = "v3.2.0.0" }
+variable "S6_VERSION" {
+}
 variable "ALPINE_VERSION" { default = "3.22.0" }
 
 target "docker-metadata-action" {}
