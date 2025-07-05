@@ -11,7 +11,7 @@ ARG ALPINE_VERSION=3.22.0
 
 # Download s6-overlay tarballs and verify their checksums.
 # $ docker buildx bake download --no-cache
-# 
+#
 # Or maunally run each target:
 # $ docker buildx bake tarballs --no-cache
 FROM scratch AS tarballs
@@ -27,7 +27,7 @@ ADD ${S6_DOWNLOAD_URL}/s6-overlay-x86_64.tar.xz                     /s6-overlay-
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-symlinks-arch.tar.xz              /s6-overlay-symlinks-arch.tar.xz
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-symlinks-noarch.tar.xz            /s6-overlay-symlinks-noarch.tar.xz
 ADD ${S6_DOWNLOAD_URL}/syslogd-overlay-noarch.tar.xz                /syslogd-overlay-noarch.tar.xz
-# 
+#
 # $ docker buildx bake verify --no-cache
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-noarch.tar.xz.sha256              /s6-overlay-noarch.tar.xz.sha256
 ADD ${S6_DOWNLOAD_URL}/s6-overlay-aarch64.tar.xz.sha256             /s6-overlay-aarch64.tar.xz.sha256

@@ -98,21 +98,21 @@ group "build" {
 }
 target "build-s6-overlay" {
     inherits = [ "s6-overlay" ]
-    tags = [ 
+    tags = [
         "docker.io/socheatsok78/s6-overlay:${S6_VERSION}",
         "ghcr.io/socheatsok78/s6-overlay:${S6_VERSION}",
     ]
 }
 target "build-s6-overlay-symlinks" {
     inherits = [ "s6-overlay-symlinks" ]
-    tags = [ 
+    tags = [
         "docker.io/socheatsok78/s6-overlay:${S6_VERSION}-symlinks",
         "ghcr.io/socheatsok78/s6-overlay:${S6_VERSION}-symlinks",
     ]
 }
 target "build-s6-overlay-syslogd" {
     inherits = [ "s6-overlay-syslogd" ]
-    tags = [ 
+    tags = [
         "docker.io/socheatsok78/s6-overlay:${S6_VERSION}-syslogd",
         "ghcr.io/socheatsok78/s6-overlay:${S6_VERSION}-syslogd",
     ]
