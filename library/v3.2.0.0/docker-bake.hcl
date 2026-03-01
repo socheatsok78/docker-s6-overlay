@@ -22,13 +22,13 @@ target "s6-overlay" {
   inherits = [ "docker-metadata-action", "github-metadata-action" ]
   target = "s6-overlay"
   platforms = [
-      "linux/386",
-      "linux/amd64",
-      "linux/arm/v6",
-      "linux/arm/v7",
-      "linux/arm64",
-      "linux/riscv64",
-      "linux/s390x",
+    "linux/386",
+    "linux/amd64",
+    "linux/arm/v6",
+    "linux/arm/v7",
+    "linux/arm64",
+    "linux/riscv64",
+    "linux/s390x",
   ]
   tags = [
     "docker.io/${replace(GITHUB_REPOSITORY, "docker-", "")}:v3.2.0.0",
@@ -40,13 +40,13 @@ target "s6-overlay-symlinks" {
   inherits = [ "docker-metadata-action", "github-metadata-action" ]
   target = "s6-overlay-symlinks"
   platforms = [
-      "linux/386",
-      "linux/amd64",
-      "linux/arm/v6",
-      "linux/arm/v7",
-      "linux/arm64",
-      "linux/riscv64",
-      "linux/s390x",
+    "linux/386",
+    "linux/amd64",
+    "linux/arm/v6",
+    "linux/arm/v7",
+    "linux/arm64",
+    "linux/riscv64",
+    "linux/s390x",
   ]
   tags = [
     "docker.io/${replace(GITHUB_REPOSITORY, "docker-", "")}:v3.2.0.0-symlinks",
@@ -58,13 +58,13 @@ target "s6-overlay-syslogd" {
   inherits = [ "docker-metadata-action", "github-metadata-action" ]
   target = "s6-overlay-syslogd"
   platforms = [
-      "linux/386",
-      "linux/amd64",
-      "linux/arm/v6",
-      "linux/arm/v7",
-      "linux/arm64",
-      "linux/riscv64",
-      "linux/s390x",
+    "linux/386",
+    "linux/amd64",
+    "linux/arm/v6",
+    "linux/arm/v7",
+    "linux/arm64",
+    "linux/riscv64",
+    "linux/s390x",
   ]
   tags = [
     "docker.io/${replace(GITHUB_REPOSITORY, "docker-", "")}:v3.2.0.0-syslogd",
