@@ -70,7 +70,7 @@ function dockerbakefile() {
 	echo "  target = \"s6-overlay\""
 	echo "  platforms = ["
 	for arch in "${docker_platforms[@]}"; do
-		echo "      \"$(build_platform "$arch")\","
+        echo "    \"$(build_platform "$arch")\","
 	done
 	echo "  ]"
 	echo "  tags = ["
@@ -84,7 +84,7 @@ function dockerbakefile() {
 	echo "  target = \"s6-overlay-symlinks\""
 	echo "  platforms = ["
 	for arch in "${docker_platforms[@]}"; do
-		echo "      \"$(build_platform "$arch")\","
+        echo "    \"$(build_platform "$arch")\","
 	done
 	echo "  ]"
 	echo "  tags = ["
@@ -98,7 +98,7 @@ function dockerbakefile() {
 	echo "  target = \"s6-overlay-syslogd\""
 	echo "  platforms = ["
 	for arch in "${docker_platforms[@]}"; do
-		echo "      \"$(build_platform "$arch")\","
+		echo "    \"$(build_platform "$arch")\","
 	done
 	echo "  ]"
 	echo "  tags = ["
