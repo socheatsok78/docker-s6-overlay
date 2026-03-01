@@ -1,88 +1,38 @@
 name: "Build"
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "Dockerfile"
-      - "docker-bake.hcl"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "Dockerfile"
-      - "docker-bake.hcl"
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * 0"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
-  generate:
+  prepare:
     runs-on: ubuntu-latest
-    steps:
-      - id: releases
-        uses: actions-matrix/github-release-matrix-action@v1
-        with:
-          repository: "just-containers/s6-overlay"
-        env:
-          GH_TOKEN: ${{ github.token }}
     outputs:
-      matrix: ${{ steps.releases.outputs.matrix }}
+      matrix: ${{ steps.generate.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Generate matrix
+        id: generate
+        run: ./.github/scripts/generate-build-matrix.sh
 
-  base:
-    needs: generate
+  s6-overlay:
+    needs:
+      - prepare
     strategy:
-      matrix: ${{ fromJson(needs.generate.outputs.matrix) }}
-    uses: ./.github/workflows/use-docker-build-release.yml
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.matrix) }}
     permissions:
       contents: read
       packages: write
+    uses: ./.github/workflows/use-docker-buildx-bake.yml
     with:
-      targets: s6-overlay
-      push: ${{ github.event_name != 'pull_request' }}
-      images: |
-        docker.io/${{ github.repository_owner }}/s6-overlay
-        ghcr.io/${{ github.repository_owner }}/s6-overlay
-      tag_name: ${{ matrix.releases.tag_name }}
-    secrets: inherit
-
-  symlinks:
-    needs: generate
-    strategy:
-      matrix: ${{ fromJson(needs.generate.outputs.matrix) }}
-    uses: ./.github/workflows/use-docker-build-release.yml
-    permissions:
-      contents: read
-      packages: write
-    with:
-      targets: s6-overlay-symlinks
-      push: ${{ github.event_name != 'pull_request' }}
-      images: |
-        docker.io/${{ github.repository_owner }}/s6-overlay
-        ghcr.io/${{ github.repository_owner }}/s6-overlay
-      tag_name: ${{ matrix.releases.tag_name }}
-      tag_suffix: symlinks
-    secrets: inherit
-
-  syslogd:
-    needs: generate
-    strategy:
-      matrix: ${{ fromJson(needs.generate.outputs.matrix) }}
-    uses: ./.github/workflows/use-docker-build-release.yml
-    permissions:
-      contents: read
-      packages: write
-    with:
-      targets: s6-overlay-syslogd
-      push: ${{ github.event_name != 'pull_request' }}
-      images: |
-        docker.io/${{ github.repository_owner }}/s6-overlay
-        ghcr.io/${{ github.repository_owner }}/s6-overlay
-      tag_name: ${{ matrix.releases.tag_name }}
-      tag_suffix: syslogd
+      version: ${{ matrix.version }}
+      permit-login: true
+      permit-push: ${{ github.event_name != 'pull_request' }}
+      permit-cache: true
     secrets: inherit

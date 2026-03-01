@@ -1,0 +1,96 @@
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: default
+        description: 'Bake version to build'
+      permit-login:
+        type: boolean
+        default: false
+        description: 'Permit login to container registry'
+      permit-push:
+        type: boolean
+        default: false
+        description: 'Permit pushing built images to container registry'
+      permit-cache:
+        type: boolean
+        default: false
+        description: 'Permit using GitHub Actions cache for buildx'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Generate matrix
+        id: generate
+        uses: docker/bake-action/subaction/matrix@v6
+        with:
+          target: default
+          files: |
+            ./library/${{ inputs.version }}/docker-bake.hcl
+
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ github.repository }}
+          flavor: latest=false
+          tags: type=raw,value=${{ inputs.version }}
+
+      - name: Generate GitHub metadata
+        id: github-meta
+        uses: dockerbakery/github-metadata-action@v4
+
+      - if: ${{ inputs.permit-login }}
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ inputs.permit-login }}
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/bake-action@v6
+        with:
+          targets: ${{ matrix.target }}
+          push: ${{ inputs.permit-push }}
+          source: "{{defaultContext}}:library/${{ inputs.version }}"
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.docker-meta.outputs.bake-file-labels }}
+            cwd://${{ steps.docker-meta.outputs.bake-file-annotations }}
+            cwd://${{ steps.github-meta.outputs.bake-file }}
+          set: |
+            ${{ inputs.permit-cache && '*.cache-from=type=gha' || ''}}
+            ${{ inputs.permit-cache && '*.cache-to=type=gha,mode=max' || ''}}
