@@ -1,1 +1,2 @@
 it:
+	./update.sh
