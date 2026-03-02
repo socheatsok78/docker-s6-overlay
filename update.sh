@@ -5,8 +5,6 @@ set -e
 outdir="library"
 docker_platforms=( "386" "amd64" "armv6" "armv7" "arm64" "riscv64" "s390x" )
 
-TEMPDIR=$(mktemp -d)
-trap 'rm -rf -- "$TEMPDIR"' EXIT
 GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER:-"socheatsok78"}
 GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-"${GITHUB_REPOSITORY_OWNER}/docker-s6-overlay"}
 S6_GITHUB_REPOSITORY=just-containers/s6-overlay
@@ -70,7 +68,7 @@ function dockerbakefile() {
 	echo "  target = \"s6-overlay\""
 	echo "  platforms = ["
 	for arch in "${docker_platforms[@]}"; do
-        echo "    \"$(build_platform "$arch")\","
+		echo "    \"$(build_platform "$arch")\","
 	done
 	echo "  ]"
 	echo "  tags = ["
@@ -84,7 +82,7 @@ function dockerbakefile() {
 	echo "  target = \"s6-overlay-symlinks\""
 	echo "  platforms = ["
 	for arch in "${docker_platforms[@]}"; do
-        echo "    \"$(build_platform "$arch")\","
+		echo "    \"$(build_platform "$arch")\","
 	done
 	echo "  ]"
 	echo "  tags = ["
