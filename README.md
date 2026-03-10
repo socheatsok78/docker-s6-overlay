@@ -97,38 +97,13 @@ Before building the image, ensure you have the following tools installed:
 - [Buildx](https://docs.docker.com/buildx/working-with-buildx/)
 - [tonistiigi/binfmt](https://github.com/tonistiigi/binfmt) - Cross-platform emulator collection distributed with Docker images.
 
-Run the following command to download and verify the `s6-overlay` tarballs:
+Run the following command to generate the build artifacts for the image:
 
 ```bash
-$ docker buildx bake download --no-cache
+$ ./update.sh
 ```
 
-The `download` target will download the `s6-overlay` tarballs from the official repository, and verify the integrity of the downloaded files. The downloaded files will be stored in the `output` directory.
-
-Build for the host platform, you can use the `local` target:
-
-```bash
-# The `local` target will build the image for the host platform only.
-# Add `--load` to load the built image into the local Docker daemon.
-# Add `--no-cache` to skip the cache and force a rebuild.s
-$ docker buildx bake local --load
-
-# Once the build is complete, the following tag will be created:
-# - localhost:5000/s6-overlay:v3.2.0.0
-# - localhost:5000/s6-overlay:v3.2.0.0-symlinks
-# - localhost:5000/s6-overlay:v3.2.0.0-symlinks-syslogd
-```
-
-If you want to build for a specific platform, you can use the `--set` flag.
-```bash
-$ docker buildx bake local --load --set="*.platform=linux/386"
-```
-
-Once you have built the image, you can use tool such as [dive](https://github.com/wagoodman/dive) to inspect the image and verify that it contains the expected files.
-
-```bash
-$ dive localhost:5000/s6-overlay:v3.2.0.0
-```
+The `update.sh` script parse through the `s6-overlay` release assets and generate the `docker-bake.hcl` file with the appropriate build targets for each architecture.
 
 # License
 
