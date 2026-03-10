@@ -90,6 +90,21 @@ Please check the [releases](https://github.com/just-containers/s6-overlay/releas
 [Docker Hub]: https://hub.docker.com/r/socheatsok78/s6-overlay
 [GitHub Container Registry]: https://github.com/socheatsok78/docker-s6-overlay/pkgs/container/s6-overlay
 
+## Development
+
+Before building the image, ensure you have the following tools installed:
+- [Docker](https://www.docker.com/)
+- [Buildx](https://docs.docker.com/buildx/working-with-buildx/)
+- [tonistiigi/binfmt](https://github.com/tonistiigi/binfmt) - Cross-platform emulator collection distributed with Docker images.
+
+Run the following command to generate the build artifacts for the image:
+
+```bash
+$ https://github.com/socheatsok78/docker-s6-overlay/raw/main/update.sh
+```
+
+The `update.sh` script parse through the `s6-overlay` release assets and generate the `docker-bake.hcl` file with the appropriate build targets for each architecture.
+
 # License
 
 Licensed under the [MIT License](https://github.com/socheatsok78/docker-s6-overlay/raw/main/LICENSE).
