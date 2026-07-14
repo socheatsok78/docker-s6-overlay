@@ -40,7 +40,7 @@ jobs:
       flavor: latest=false
       source: "{{defaultContext}}:library/${{ matrix.version }}"
       tags: type=raw,value=${{ matrix.version }}
-      permit-login: ${{ inputs.permit-push || github.event_name != 'pull_request' }}
-      permit-push: ${{ inputs.permit-push || github.event_name != 'pull_request' }}
+      permit-login: ${{ inputs.permit-push }}
+      permit-push: ${{ inputs.permit-push }}
       permit-cache: true
     secrets: inherit
