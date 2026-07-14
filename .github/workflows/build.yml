@@ -2,6 +2,12 @@ name: "Build"
 
 on:
   workflow_dispatch:
+    inputs:
+      permit-push:
+        type: boolean
+        description: 'Permit push to registry'
+        required: false
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,7 +39,7 @@ jobs:
     with:
       flavor: latest=false
       tags: type=raw,value=${{ matrix.version }}
-      permit-login: true
-      permit-push: ${{ github.event_name != 'pull_request' }}
+      permit-login: ${{ inputs.permit-push || github.event_name != 'pull_request' }}
+      permit-push: ${{ inputs.permit-push || github.event_name != 'pull_request' }}
       permit-cache: true
     secrets: inherit
