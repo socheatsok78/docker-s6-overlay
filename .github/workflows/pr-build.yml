@@ -35,6 +35,7 @@ jobs:
     uses: socheatsok78/uses/.github/workflows/docker-buildx-bake.yml@main
     with:
       flavor: latest=false
+      source: "{{defaultContext}}:library/${{ matrix.version }}"
       tags: type=raw,value=${{ matrix.version }}
       permit-login: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
       permit-push: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
