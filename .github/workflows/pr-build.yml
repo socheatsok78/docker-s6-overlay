@@ -15,7 +15,7 @@ jobs:
     outputs:
       matrix: ${{ steps.generate.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Generate matrix
@@ -32,9 +32,10 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: ./.github/workflows/use-docker-buildx-bake.yml
+    uses: socheatsok78/uses/.github/workflows/docker-buildx-bake.yml@main
     with:
-      version: ${{ matrix.version }}
+      flavor: latest=false
+      tags: type=raw,value=${{ matrix.version }}
       permit-login: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
       permit-push: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
       permit-cache: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
@@ -49,7 +50,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Evaluate the PR for merging
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
