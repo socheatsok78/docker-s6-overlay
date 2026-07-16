@@ -40,6 +40,7 @@ jobs:
       flavor: latest=false
       source: "{{defaultContext}}:library/${{ matrix.version }}"
       tags: type=raw,value=${{ matrix.version }}
+      enable-dockerhub: true
       permit-login: ${{ inputs.permit-push }}
       permit-push: ${{ inputs.permit-push }}
       permit-cache: true
