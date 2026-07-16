@@ -37,6 +37,7 @@ jobs:
       flavor: latest=false
       source: "{{defaultContext}}:library/${{ matrix.version }}"
       tags: type=raw,value=${{ matrix.version }}
+      enable-dockerhub: true
       permit-login: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
       permit-push: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
       permit-cache: ${{ contains(github.event.pull_request.labels.*.name, 'pr-pull') }}
